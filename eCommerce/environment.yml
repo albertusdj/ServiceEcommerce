@@ -1,0 +1,12 @@
+name: ppls
+channels:
+- !!python/unicode
+  'defaults'
+dependencies:
+- !!python/unicode
+  'pip'
+- !!python/unicode
+  'python=3.6.*'
+- pip:
+  - django
+
