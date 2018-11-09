@@ -13,9 +13,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path
+from django.conf.urls import url
+from eCommerceApp.views import *
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+	# Karena pake wildcard, urutannya harus diperhatiin. regex yg lebih spesifik diatas!
+
+	#url(r'^tes/$', views.tes),
+
+	url(r'^users/$', UsersView.as_view()),
+	url(r'^users/(?P<username>.+)/wishlist/$', WishlistView.as_view()),
+	url(r'^users/(?P<username>.+)/cart/$', CartView.as_view()),
+	url(r'^users/(?P<username>.+)/$', UserView.as_view()),
+
+	url(r'^wishlists/$', WishlistsView.as_view()),
+	url(r'^carts/$', CartsView.as_view()),
+
 ]
