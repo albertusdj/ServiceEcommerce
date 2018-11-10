@@ -24,9 +24,19 @@ urlpatterns = [
 	url(r'^users/$', UsersView.as_view()),
 	url(r'^users/(?P<username>.+)/wishlist/$', WishlistView.as_view()),
 	url(r'^users/(?P<username>.+)/cart/$', CartView.as_view()),
+	url(r'^users/(?P<username>.+)/orders/$', BuyerOrder.as_view()),
 	url(r'^users/(?P<username>.+)/$', UserView.as_view()),
 
 	url(r'^wishlists/$', WishlistsView.as_view()),
 	url(r'^carts/$', CartsView.as_view()),
+
+	url(r'^orders/$',OrdersView.as_view()),
+	url(r'^orders/(?P<order_id>.+)/$',OrderView.as_view()),
+	
+	url(r'^responses/$', ProductResponsesView.as_view()),
+	url(r'^responses/(?P<response_id>.+)/$',ProductResponseView.as_view()),
+
+	url(r'^promotions/$', PromotionsView.as_view()),
+	url(r'^promotions/(?P<promotion_id>.+)/$',PromotionView.as_view()),
 
 ]

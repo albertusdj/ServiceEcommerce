@@ -1,7 +1,7 @@
 # ENVIRONMENT
 1. `git clone http://gitlab.informatika.org/albertusdj/ServiceEcommerce`
 2. `cd ServiceEcommerce`
-3. `conda create environment -f yml`
+3. `conda env create -f environment.yml`
 4.`activate ppls`. bash/sudo: `source activate ppls`
 5. `nano eCommerce/eCommerce/settings.py`
 `INSTALLED_APPS = [
@@ -20,7 +20,10 @@ DATABASES = {
 6. `python manage.py makemigrations`
 7. `python manage.py migrate`
 8. `python manage.py runserver`
-9. `source deactivate`
+9. to access sqlite db `python manage.py dbshell` 
+10. `source deactivate`
+
+
 
 # ENDPOINTS (notice trailing slash)
 ## User
@@ -42,8 +45,8 @@ DATABASES = {
 ###### GET ALL PRODUCTS SOLD BY USER: GET /users/{username}/products/
 ###### DELETE ALL PRODUCTS SOLD BY USER: DELETE /users/{username}/products/
 
-###### GET ALL ORDERS OF BUYER: GET /users/{username}/orders/
-###### DELETE ALL ORDERS OF BUYER: DELETE /users/{username}/orders/
+###### GET ALL ORDERS OF BUYER: GET /users/{username}/orders/ :heavy_check_mark:
+###### DELETE ALL ORDERS OF BUYER: DELETE /users/{username}/orders/ :heavy_check_mark:
 ###### GET ALL ORDERS OF SELLER: GET /users/{username}/sales/orders/
 ###### DELETE ALL ORDERS OF SELLER: DELETE /users/{username}/sales/orders/
 
@@ -72,23 +75,23 @@ DATABASES = {
 ###### INDEX: GET /carts/ :heavy_check_mark:
 
 ## Order
-###### INDEX: GET /orders/
-###### CREATE: POST /orders/
-###### SHOW: GET /orders/{order-id}/
-###### UPDATE: PUT /orders/{order-id}/
-###### DELETE: DELETE /orders/{order-id}/
+###### INDEX: GET /orders/ :heavy_check_mark:
+###### CREATE: POST /orders/ :heavy_check_mark:
+###### SHOW: GET /orders/{order-id}/ :heavy_check_mark:
+###### UPDATE: PUT /orders/{order-id}/ :heavy_check_mark:
+###### DELETE: DELETE /orders/{order-id}/ :heavy_check_mark:
 
 ## ProductResponse
-###### INDEX: GET /responses/
-###### CREATE: POST /responses/
-###### SHOW: GET /responses/{response-id}/
-###### UPDATE: PUT /responses/{response-id}/
-###### DELETE: DELETE /responses/{response-id}/
+###### INDEX: GET /responses/ :heavy_check_mark:
+###### CREATE: POST /responses/ :heavy_check_mark:
+###### SHOW: GET /responses/{response-id}/ :heavy_check_mark:
+###### UPDATE: PUT /responses/{response-id}/ :heavy_check_mark:
+###### DELETE: DELETE /responses/{response-id}/ :heavy_check_mark:
 
 ## Promotion
-###### INDEX: GET /promotions/
-###### CREATE: POST /promotions/
-###### SHOW: GET /promotions/{promotion-id}/
-###### UPDATE: PUT /promotions/{promotion-id}/
-###### DELETE: DELETE /promotions/{promotion-id}/
+###### INDEX: GET /promotions/ :heavy_check_mark:
+###### CREATE: POST /promotions/ :heavy_check_mark:
+###### SHOW: GET /promotions/{promotion-id}/ :heavy_check_mark:
+###### UPDATE: PUT /promotions/{promotion-id}/ :heavy_check_mark:
+###### DELETE: DELETE /promotions/{promotion-id}/ :heavy_check_mark:
 
