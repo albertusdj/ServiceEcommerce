@@ -46,8 +46,14 @@ urlpatterns = [
 	url(r'^users/(?P<username>.+)/cart/(?P<product_id>[0-9]+)/$', UserCart.as_view()),
 	#ct: /users/user1/products/
 	url(r'^users/(?P<username>.+)/products/$', UserProduct.as_view()),
+	#ct: /users/user1/sales/orders/
+	url(r'^users/(?P<username>.+)/sales/orders/$', SellerOrder.as_view()),
 	#ct: /users/user1/orders/
 	url(r'^users/(?P<username>.+)/orders/$', BuyerOrder.as_view()),
+	#ct: /users/user1/sales/responses/
+	url(r'^users/(?P<username>.+)/sales/responses/$', SellerResponse.as_view()),
+	#ct: /users/user1/responses/
+	url(r'^users/(?P<username>.+)/responses/$', BuyerResponse.as_view()),
 	#ct: /users/user1/
 	url(r'^users/(?P<username>.+)/$', UserView.as_view()),
 
@@ -61,6 +67,10 @@ urlpatterns = [
 	url(r'^products/$', ProductsView.as_view()),
 	#ct: /products/1/
 	url(r'^products/(?P<product_id>[0-9]+)/$', ProductView.as_view()),
+	#ct: /products/1/promotions/
+	url(r'^products/(?P<product_id>[0-9]+)/promotions/$', ProductPromotion.as_view()),
+	#ct: /products/1/responses/
+	url(r'^products/(?P<product_id>[0-9]+)/responses/$', ProductProductResponse.as_view()),
 
 	###################################################################################################################
 	#

@@ -1,4 +1,5 @@
 from django.core import serializers
+from django.db.models import Sum
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -21,7 +22,7 @@ def searchOrderStatus(request):
 	filtered = OrderStatusFilter(request.GET, queryset=status)
 	response = serializers.serialize('json', filtered.qs)
 	return HttpResponse(response)
-	
+
 def searchProductResponseTypes(request):
 	response_types = ProductResponseType.objects.all()
 	filtered = ProductResponseTypeFilter(request.GET, queryset=response_types)
@@ -44,14 +45,7 @@ class UsersView(View):
 	# Create user
 	def post(self, request):
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 
 		# TO-DO : VALIDATION
 		username = body['username']
@@ -84,14 +78,7 @@ class UserView(View):
 	def put(self, request, username):
 		user = get_object_or_404(User, username=username)
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 
 		# TO-DO : VALIDATION
 		try:
@@ -134,14 +121,7 @@ class ProductsView(View):
 	# Create
 	def post(self, request):
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 
 		# TO-DO : VALIDATION
 		username = body['username']
@@ -180,14 +160,7 @@ class ProductView(View):
 	def put(self, request, product_id):
 		product = get_object_or_404(Product, id=product_id)
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 
 		# TO-DO : VALIDATION
 		try:
@@ -258,14 +231,7 @@ class UserWishlist(View):
 	def post(self, request, username):
 		user = get_object_or_404(User, username=username) #object
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 		product_id = body['product_id']
 		product = get_object_or_404(Product, pk=product_id)
 		wishlist = Wishlist.objects.get_or_create(user=user,product=product)
@@ -304,13 +270,7 @@ class UserCart(View):
 	def post(self, request, username):
 		user = get_object_or_404(User, username=username) #object
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 		product_id = body['product_id']
 		product = get_object_or_404(Product, pk=product_id)
 		cart = Cart.objects.get_or_create(user=user,product=product)
@@ -328,13 +288,7 @@ class UserCart(View):
 	def put(self, request, username, product_id):
 		user = get_object_or_404(User, username=username) #object
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 		product_id = body['product_id']
 		product = get_object_or_404(Product, pk=product_id)
 		cart = get_object_or_404(Cart, user=user, product=product)
@@ -365,36 +319,30 @@ class OrdersView(View):
 		orders = Order.objects.all()
 		response = serializers.serialize('json', orders)
 		return HttpResponse(response)
+
 	# Create Order
 	def post(self,request):
 		query_string = request.body.decode('utf-8')
+		body = json.loads(query_string)
+		username = body['username']
+		user = get_object_or_404(User, username=username)
+		data={}
+		data['user'] = user
 		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
-		# Belum Di handle kalau jumlah produk array
-		products = body['product']
-		if (products.objects.filter(pk=products).count() == 0):
-			return HttpResponse(status=403)
-		data = {}
-		data['products'] = body['products']
-		try:
-			data['quantity'] = body['quantity']
+			status_id = body['status_id']
+			data['status'] = get_object_or_404(OrderStatus,pk=status_id)
 		except:
-			pass
-		try:
-			data['total'] = body['total']
-		except:
-			pass
-		try:
-			data['status'] = body['status']
-		except:
-			pass
+			data['status'] =  OrderStatus.objects.filter(name__icontains="pending").first()
 		order = Order(**data)
+		order.save()
+
+		products = body['products_id']
+		quantities = body['quantities']
+		for (product_id, quantity) in zip(products,quantities) :
+			product = get_object_or_404(Product,pk=product_id)
+			order.total += product.price * quantity
+			op = OrderProduct(order=order,product=product, quantity=quantity)
+			op.save()
 		order.save()
 		response = serializers.serialize('json', [order])
 		return HttpResponse(response)
@@ -403,32 +351,22 @@ class OrderView(View):
 	# Show Specific Order Detail
 	def get(self, request, order_id):
 		order = get_object_or_404(Order, pk=order_id)
-		if order :
-			response = serializers.serialize('json', [order])
+		response = serializers.serialize('json', [order])
 		return HttpResponse(response)
 
 	# Update Specific Order Detail
 	def put(self,request,order_id):
 		order = get_object_or_404(Order, pk=order_id)
 		query_string = request.body.decode('utf-8')
+		body = json.loads(query_string)
+		print(body)
 		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
-		try:
-			order.quantity = body['quantity']
+			order.total = body['total']
 		except:
 			pass
 		try:
-			user.total = body['total']
-		except:
-			pass
-		try:
-			user.status = body['status']
+			status_id = body['status_id']
+			order.status = get_object_or_404(OrderStatus,pk=status_id)
 		except:
 			pass
 		order.save()
@@ -445,30 +383,68 @@ class BuyerOrder(View):
 	# Get All Order of Buyer
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
-		order = order.objects.filter(user=user).first()
-		response = "[]"
-		if wishlist :
-			response = serializers.serialize('json', [order]) #for object
+		order = Order.objects.filter(user=user)
+		response = serializers.serialize('json', order) #for object
 		return HttpResponse(response)
+
 	# Delete All order of Buyer
 	def delete(self, request, username):
 		user = get_object_or_404(User, username=username) #object
-		order = order.objects.filter(user=user).first()
+		order = Order.objects.filter(user=user)
 		order.delete()
 		return HttpResponse(status=204)
 
-# class SellerOrder(View):
+class SellerOrder(View):
 	# Get All Order of Seller
-	# def get(self, request, username):
+	def get(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		order = Order.objects.filter(products__user=user)
+		response = serializers.serialize('json', order) #for object
+		return HttpResponse(response)
 
 	# Delete All order of Seller
-	# def delete(self, request, username):
+	def delete(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		order = Order.objects.filter(products__user=user)
+		order.delete()
+		return HttpResponse(status=204)
+
+class BuyerResponse(View):
+	# Get All response of Buyer
+	def get(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		presponses = ProductResponse.objects.filter(user=user)
+		response = serializers.serialize('json', presponses) #for object
+		return HttpResponse(response)
+
+	# Delete All response of Buyer
+	def delete(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		presponses = ProductResponse.objects.filter(user=user)
+		presponses.delete()
+		return HttpResponse(status=204)
+
+class SellerResponse(View):
+	# Get All response of Seller
+	def get(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		presponses = ProductResponse.objects.filter(product__user=user)
+		response = serializers.serialize('json', presponses) #for object
+		return HttpResponse(response)
+
+	# Delete All response of Seller
+	def delete(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		presponses = ProductResponse.objects.filter(product__user=user)
+		presponses.delete()
+		return HttpResponse(status=204)
 
 ###################################################################################################################
 #
 # ProductResponse
 #
 ###################################################################################################################
+
 class ProductResponsesView(View):
 	# Product Responses Index
 	def get(self, request):
@@ -478,51 +454,37 @@ class ProductResponsesView(View):
 	# Create Product Response
 	def post(self,request):
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
-
+		body = json.loads(query_string)
 		username = body['username']
 		user = get_object_or_404(User, username=username)
-		product_id = body['product_id']
-		order_id = body['order_id']
 		data = {}
-		data['user_id'] = user.id
-		data['product_id'] = product_id
-		data['order_id'] = order_id
-		try:
-			data['content'] = body['content']
-		except:
-			pass
+		data['user'] = user
+		product_id = body['product_id']
+		data['product'] = get_object_or_404(Product, pk=product_id)
+		response_type_id = body['response_type_id']
+		response_type = get_object_or_404(ProductResponseType,id=response_type_id)
+		data['response_type'] = response_type
+		if (response_type_id in [1,2]) : #rating or review
+			order_id = body['order_id']
+			data['order'] = get_object_or_404(Order,pk=order_id)
+		data['content'] = body['content']
 		product_response = ProductResponse(**data)
 		product_response.save()
 		response = serializers.serialize('json', [product_response])
 		return HttpResponse(response)
+
 class ProductResponseView(View):
 	# Show Specific Product Response
 	def get(self, request, response_id):
 		product_response = get_object_or_404(ProductResponse, pk=response_id)
-		if product_response :
-			response = serializers.serialize('json', [product_response])
+		response = serializers.serialize('json', [product_response])
 		return HttpResponse(response)
 
 	# Update Specific Product Response
-	def put(self, request, order_id):
-		product_response = get_object_or_404(Order, pk=response_id)
+	def put(self, request, response_id):
+		product_response = get_object_or_404(ProductResponse, pk=response_id)
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 		try:
 			product_response.content = body['content']
 		except:
@@ -533,31 +495,42 @@ class ProductResponseView(View):
 
 	# Delete Specific Product Response
 	def delete(self,request,response_id):
-		product_response = get_object_or_404(Order, pk=response_id)
+		product_response = get_object_or_404(ProductResponse, pk=response_id)
 		product_response.delete()
 		return HttpResponse(status=204)
+
+class ProductProductResponse(View):
+	# Show All
+	def get(self, request, product_id):
+		product = get_object_or_404(Product, pk=product_id) #object
+		product_responses = ProductResponse.objects.filter(product=product)
+		response = serializers.serialize('json', product_responses)
+		return HttpResponse(response)
+
+	# Delete All
+	def delete(self, request, product_id):
+		product = get_object_or_404(Product, pk=product_id) #object
+		product_responses = ProductResponse.objects.filter(product=product)
+		product_responses.delete()
+		return HttpResponse(status=204)
+
 ###################################################################################################################
 #
 # Promotion
 #
 ###################################################################################################################
+
 class PromotionsView(View):
 	# Promotions Index
 	def get(self, request):
 		promotions = Promotion.objects.all()
 		response = serializers.serialize('json', promotions)
 		return HttpResponse(response)
+
 	# Create Promotion
 	def post(self,request):
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 
 		product_id = body['product_id']
 		product = get_object_or_404(Product, id=product_id)
@@ -579,6 +552,7 @@ class PromotionsView(View):
 		promotion.save()
 		response = serializers.serialize('json', [promotion])
 		return HttpResponse(response)
+
 class PromotionView(View):
 	# Show Specific Promotion
 	def get(self, request, promotion_id):
@@ -591,14 +565,7 @@ class PromotionView(View):
 	def put(self, request, promotion_id):
 		promotion = get_object_or_404(Promotion, pk=promotion_id)
 		query_string = request.body.decode('utf-8')
-		try:
-			# u/ text, text/plain, application/json
-			body = json.loads(query_string)
-		except Exception as e:
-			# u/ application/x-www-urlencoded
-			# pass
-			json_string = json.dumps(urlparse.parse_qs(query_string))
-			body = json.loads(json_string)
+		body = json.loads(query_string)
 		try:
 			promotion.content = body['content']
 		except:
@@ -619,4 +586,19 @@ class PromotionView(View):
 	def delete(self,request,promotion_id):
 		promotion = get_object_or_404(Promotion, pk=promotion_id)
 		promotion.delete()
+		return HttpResponse(status=204)
+
+class ProductPromotion(View):
+	# Show All
+	def get(self, request, product_id):
+		product = get_object_or_404(Product, pk=product_id) #object
+		promotions = Promotion.objects.filter(product=product)
+		response = serializers.serialize('json', promotions)
+		return HttpResponse(response)
+
+	# Delete All
+	def delete(self, request, product_id):
+		product = get_object_or_404(Product, pk=product_id) #object
+		promotions = Promotion.objects.filter(product=product)
+		promotions.delete()
 		return HttpResponse(status=204)

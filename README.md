@@ -71,7 +71,7 @@
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
 	response_type = models.ForeignKey(ProductResponseType, on_delete=models.CASCADE)
-	content = models.CharField(max_length=500, default="")
+	content = models.CharField(max_length=500)
 
 ## Promotion
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -101,13 +101,13 @@
 
 ###### GET ALL ORDERS OF BUYER: GET /users/{username}/orders/ :heavy_check_mark:
 ###### DELETE ALL ORDERS OF BUYER: DELETE /users/{username}/orders/ :heavy_check_mark:
-###### GET ALL ORDERS OF SELLER: GET /users/{username}/sales/orders/
-###### DELETE ALL ORDERS OF SELLER: DELETE /users/{username}/sales/orders/
+###### GET ALL ORDERS OF SELLER: GET /users/{username}/sales/orders/ :heavy_check_mark:
+###### DELETE ALL ORDERS OF SELLER: DELETE /users/{username}/sales/orders/ :heavy_check_mark:
 
-###### GET RESPONSES OF BUYER: GET /users/{username}/responses/
-###### DELETE ALL RESPONSES OF BUYER: /users/{username}/responses/
-###### GET RESPONSES OF BUYER: GET /users/{username}/responses/
-###### DELETE ALL RESPONSES OF BUYER: /users/{username}/responses/
+###### GET RESPONSES OF BUYER: GET /users/{username}/responses/ :heavy_check_mark:
+###### DELETE ALL RESPONSES OF BUYER: /users/{username}/responses/ :heavy_check_mark:
+###### GET RESPONSES OF SELLER: GET /users/{username}/sales/responses/ :heavy_check_mark:
+###### DELETE ALL RESPONSES OF SELLER: /users/{username}/sales/responses/ :heavy_check_mark:
 
 ## Product
 ###### INDEX: GET /products/ :heavy_check_mark:
@@ -116,11 +116,11 @@
 ###### UPDATE: PUT /products/{product-id}/ :heavy_check_mark:
 ###### DELETE: DELETE /products/{product-id}/ :heavy_check_mark:
 
-###### GET RESPONSES OF PRODUCT: GET /products/{product-id}/responses/
-###### DELETE ALL RESPONSES OF PRODUCT: DELETE /products/{product-id}/responses/
+###### GET RESPONSES OF PRODUCT: GET /products/{product-id}/responses/ :heavy_check_mark:
+###### DELETE ALL RESPONSES OF PRODUCT: DELETE /products/{product-id}/responses/ :heavy_check_mark:
 
-###### GET PROMO OF PRODUCT: GET /products/{product-id}/promotions/
-###### DELETE ALL PROMO OF PRODUCT: DELETE /products/{product-id}/promotions/
+###### GET PROMO OF PRODUCT: GET /products/{product-id}/promotions/ :heavy_check_mark:
+###### DELETE ALL PROMO OF PRODUCT: DELETE /products/{product-id}/promotions/ :heavy_check_mark:
 
 ## Wishlist
 ###### INDEX: GET /wishlists/ :heavy_check_mark:

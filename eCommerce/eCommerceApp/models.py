@@ -46,7 +46,7 @@ class ProductResponse(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
 	response_type = models.ForeignKey(ProductResponseType, on_delete=models.CASCADE)
-	content = models.CharField(max_length=500, default="")
+	content = models.CharField(max_length=500)
 
 class Promotion(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
