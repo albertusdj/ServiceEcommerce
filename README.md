@@ -20,8 +20,8 @@
 ###### 6. `python manage.py makemigrations`
 ###### 7. `python manage.py migrate`
 ###### 8. `python manage.py runserver`
-###### 8. to access sqlite db `python manage.py dbshell`
-###### 9. `source deactivate`
+###### 9. to access sqlite db `python manage.py dbshell`
+###### 10. `source deactivate`
 
 # MODELS
 ## User
