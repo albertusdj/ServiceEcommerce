@@ -20,7 +20,7 @@ class Wishlist(models.Model):
 class Cart(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	quantity = models.IntegerField()
+	quantity = models.IntegerField(default=1)
 	subtotal = models.FloatField(default=0)
 
 class OrderStatus(models.Model):
@@ -28,12 +28,16 @@ class OrderStatus(models.Model):
 	description = models.CharField(max_length=500)
 
 class Order(models.Model):
-	order = models.ForeignKey(User, on_delete=models.CASCADE)
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	quantity = models.IntegerField()
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	products = models.ManyToManyField(Product, through='OrderProduct')
 	total = models.FloatField(default=0)
 	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
 
+class OrderProduct(models.Model):
+	order = models.ForeignKey(Order, on_delete=models.CASCADE)
+	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+	quantity = models.IntegerField()
+	
 class ProductResponseType(models.Model):
 	name = models.CharField(max_length=100)
 
