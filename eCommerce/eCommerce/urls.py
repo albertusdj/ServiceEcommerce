@@ -22,6 +22,12 @@ urlpatterns = [
 	#ct: /tes/
 	#url(r'^tes/$', tes),
 
+	#cr: /order-status/
+	url(r'^order-status/$', searchOrderStatus),
+
+	#cr: /response-types/
+	url(r'^response-types/$', searchProductResponseTypes),
+	
 	###################################################################################################################
 	#
 	# User
@@ -32,8 +38,14 @@ urlpatterns = [
 	url(r'^users/$', UsersView.as_view()),
 	#ct: /users/user1/wishlist/
 	url(r'^users/(?P<username>.+)/wishlist/$', UserWishlist.as_view()),
+	#ct: /users/user1/wishlist/1/
+	url(r'^users/(?P<username>.+)/wishlist/(?P<product_id>[0-9]+)/$', UserWishlist.as_view()),
 	#ct: /users/user1/cart/
 	url(r'^users/(?P<username>.+)/cart/$', UserCart.as_view()),
+	#ct: /users/user1/cart/1/
+	url(r'^users/(?P<username>.+)/cart/(?P<product_id>[0-9]+)/$', UserCart.as_view()),
+	#ct: /users/user1/products/
+	url(r'^users/(?P<username>.+)/products/$', UserProduct.as_view()),
 	#ct: /users/user1/orders/
 	url(r'^users/(?P<username>.+)/orders/$', BuyerOrder.as_view()),
 	#ct: /users/user1/

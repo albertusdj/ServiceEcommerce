@@ -4,6 +4,7 @@ from django.views.generic import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
 from eCommerceApp.models import User, Product, Wishlist, Cart, OrderStatus, Order, ProductResponseType, ProductResponse, Promotion
+from eCommerceApp.filters import *
 
 import json
 from urllib import parse as urlparse
@@ -15,6 +16,18 @@ def tes(request):
 	return render(request, 'tes.html', c)
 '''
 
+def searchOrderStatus(request):
+	status = OrderStatus.objects.all()
+	filtered = OrderStatusFilter(request.GET, queryset=status)
+	response = serializers.serialize('json', filtered.qs)
+	return HttpResponse(response)
+	
+def searchProductResponseTypes(request):
+	response_types = ProductResponseType.objects.all()
+	filtered = ProductResponseTypeFilter(request.GET, queryset=response_types)
+	response = serializers.serialize('json', filtered.qs)
+	return HttpResponse(response)
+
 ###################################################################################################################
 #
 # User
@@ -24,7 +37,8 @@ class UsersView(View):
 	# Users Index
 	def get(self, request):
 		users = User.objects.all() #queryset
-		response = serializers.serialize('json', users) #u/ queryset
+		filtered = UserFilter(request.GET, queryset=users)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
 	# Create user
@@ -113,7 +127,8 @@ class ProductsView(View):
 	# Index
 	def get(self, request):
 		products = Product.objects.all() #queryset
-		response = serializers.serialize('json', products) #u/ queryset
+		filtered = ProductFilter(request.GET, queryset=products)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
 	# Create
@@ -135,6 +150,10 @@ class ProductsView(View):
 		data['user'] = user
 		try :
 			data['name'] = body['name']
+		except:
+			pass
+		try :
+			data['description'] = body['description']
 		except:
 			pass
 		try :
@@ -176,6 +195,10 @@ class ProductView(View):
 		except:
 			pass
 		try:
+			product.description = body['description']
+		except:
+			pass
+		try:
 			product.price = body['price']
 		except:
 			pass
@@ -195,6 +218,22 @@ class ProductView(View):
 		product.delete()
 		return HttpResponse(status=204)
 
+class UserProduct(View):
+	# Show All
+	def get(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		products = Product.objects.filter(user=user)
+		response = serializers.serialize('json', products) #for object
+		return HttpResponse(response)
+		
+	# Delete All
+	def delete(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		products = Product.objects.filter(user=user)
+		products.delete()
+		return HttpResponse(status=204)
+
+
 ###################################################################################################################
 #
 # Wishlist
@@ -211,11 +250,35 @@ class UserWishlist(View):
 	# User wishlist
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
-		wishlist = Wishlist.objects.filter(user=user).first()
-		response = "[]"
-		if wishlist :
-			response = serializers.serialize('json', [wishlist]) #for object
+		wishlist = Wishlist.objects.filter(user=user)
+		response = serializers.serialize('json', wishlist) #for object
 		return HttpResponse(response)
+
+	# Add to wishlist
+	def post(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		query_string = request.body.decode('utf-8')
+		try:
+			# u/ text, text/plain, application/json
+			body = json.loads(query_string)
+		except Exception as e:
+			# u/ application/x-www-urlencoded
+			# pass
+			json_string = json.dumps(urlparse.parse_qs(query_string))
+			body = json.loads(json_string)
+		product_id = body['product_id']
+		product = get_object_or_404(Product, pk=product_id)
+		wishlist = Wishlist.objects.get_or_create(user=user,product=product)
+		response = serializers.serialize('json', [wishlist[0]])
+		return HttpResponse(response)
+
+	# Remove from wishlist
+	def delete(self, request, username, product_id):
+		user = get_object_or_404(User, username=username)
+		product = get_object_or_404(Product, pk=product_id)
+		wishlist = Wishlist.objects.filter(user=user,product=product)
+		wishlist.delete()
+		return HttpResponse(status=204)
 
 ###################################################################################################################
 #
@@ -233,11 +296,63 @@ class UserCart(View):
 	# User cart
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
-		cart = Cart.objects.filter(user=user).first()
-		response = "[]"
-		if cart :
-			response = serializers.serialize('json', [cart]) #for object
+		cart = Cart.objects.filter(user=user)
+		response = serializers.serialize('json', cart) #for object
 		return HttpResponse(response)
+
+	# Add to cart
+	def post(self, request, username):
+		user = get_object_or_404(User, username=username) #object
+		query_string = request.body.decode('utf-8')
+		try:
+			# u/ text, text/plain, application/json
+			body = json.loads(query_string)
+		except Exception as e:
+			# u/ application/x-www-urlencoded
+			json_string = json.dumps(urlparse.parse_qs(query_string))
+			body = json.loads(json_string)
+		product_id = body['product_id']
+		product = get_object_or_404(Product, pk=product_id)
+		cart = Cart.objects.get_or_create(user=user,product=product)
+		try:
+			cart[0].quantity+=body['quantity']
+		except:
+			pass
+		cart[0].subtotal = product.price * cart[0].quantity
+		cart[0].save()
+
+		response = serializers.serialize('json', [cart[0]])
+		return HttpResponse(response)
+
+	# Modify in cart
+	def put(self, request, username, product_id):
+		user = get_object_or_404(User, username=username) #object
+		query_string = request.body.decode('utf-8')
+		try:
+			# u/ text, text/plain, application/json
+			body = json.loads(query_string)
+		except Exception as e:
+			# u/ application/x-www-urlencoded
+			json_string = json.dumps(urlparse.parse_qs(query_string))
+			body = json.loads(json_string)
+		product_id = body['product_id']
+		product = get_object_or_404(Product, pk=product_id)
+		cart = get_object_or_404(Cart, user=user, product=product)
+		cart.quantity=body['quantity']
+		if (cart.quantity == 0) :
+			return self.delete(request, username, product_id)
+		cart.subtotal = product.price * cart.quantity
+		cart.save()
+		response = serializers.serialize('json', [cart])
+		return HttpResponse(response)
+
+	# Remove from cart
+	def delete(self, request, username, product_id):
+		user = get_object_or_404(User, username=username)
+		product = get_object_or_404(Product, pk=product_id)
+		cart = Cart.objects.filter(user=user, product=product)
+		cart.delete()
+		return HttpResponse(status=204)
 
 ###################################################################################################################
 #
@@ -247,7 +362,7 @@ class UserCart(View):
 class OrdersView(View):
 	# Orders Index
 	def get(self, request):
-		orders = Order.object.all()
+		orders = Order.objects.all()
 		response = serializers.serialize('json', orders)
 		return HttpResponse(response)
 	# Create Order
@@ -456,6 +571,10 @@ class PromotionsView(View):
 			data['content'] = body['content']
 		except:
 			pass
+		try:
+			data['is_valid'] = body['is_valid']
+		except:
+			pass
 		promotion = Promotion(**data)
 		promotion.save()
 		response = serializers.serialize('json', [promotion])
@@ -486,6 +605,10 @@ class PromotionView(View):
 			pass
 		try:
 			promotion.name = body['name']
+		except:
+			pass
+		try:
+			promotion.is_valid = body['is_valid']
 		except:
 			pass
 		promotion.save()

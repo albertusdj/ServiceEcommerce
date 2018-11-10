@@ -1,5 +1,39 @@
 [
   {
+    "model": "eCommerceApp.user",
+    "pk": 1,
+    "fields": {
+      "username": "tes",
+      "password": "password"
+    }
+  },
+  {
+    "model": "eCommerceApp.product",
+    "pk": 1,
+    "fields": {
+      "user_id" : 1,
+      "name": "baju bekas",
+      "price": "999999"
+    }
+  },
+  {
+    "model": "eCommerceApp.product",
+    "pk": 2,
+    "fields": {
+      "user_id" : 1,
+      "name": "keset bekas",
+      "price": "999"
+    }
+  },
+  {
+    "model": "eCommerceApp.promotion",
+    "pk": 1,
+    "fields": {
+      "product_id" : 1,
+      "name": "diskon baju bekas"
+    }
+  },
+  {
     "model": "eCommerceApp.productresponsetype",
     "pk": 1,
     "fields": {
