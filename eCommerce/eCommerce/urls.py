@@ -34,6 +34,8 @@ urlpatterns = [
 	url(r'^users/(?P<username>.+)/wishlist/$', UserWishlist.as_view()),
 	#ct: /users/user1/cart/
 	url(r'^users/(?P<username>.+)/cart/$', UserCart.as_view()),
+	#ct: /users/user1/orders/
+	url(r'^users/(?P<username>.+)/orders/$', BuyerOrder.as_view()),
 	#ct: /users/user1/
 	url(r'^users/(?P<username>.+)/$', UserView.as_view()),
 
@@ -63,5 +65,38 @@ urlpatterns = [
 
 	#ct: /carts/
 	url(r'^carts/$', CartsView.as_view()),
+
+	###################################################################################################################
+	#
+	# Order
+	#
+	###################################################################################################################
+
+	#ct: /orders/
+	url(r'^orders/$',OrdersView.as_view()),
+	#ct: /orders/1/
+	url(r'^orders/(?P<order_id>.+)/$',OrderView.as_view()),
+	
+	###################################################################################################################
+	#
+	# Responses
+	#
+	###################################################################################################################
+
+	#ct: /responses/
+	url(r'^responses/$', ProductResponsesView.as_view()),
+	#ct: /responses/1/
+	url(r'^responses/(?P<response_id>.+)/$',ProductResponseView.as_view()),
+
+	###################################################################################################################
+	#
+	# Promotion
+	#
+	###################################################################################################################
+
+	#ct: /promotions/
+	url(r'^promotions/$', PromotionsView.as_view()),
+	#ct: /promotions/1/
+	url(r'^promotions/(?P<promotion_id>.+)/$',PromotionView.as_view()),
 
 ]
