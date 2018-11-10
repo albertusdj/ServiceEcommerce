@@ -54,10 +54,14 @@
 
 ## Order
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	quantity = models.IntegerField()
+	products = models.ManyToManyField(Product, through='OrderProduct')
 	total = models.FloatField(default=0)
 	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
+
+## OrderProduct
+	order = models.ForeignKey(Order, on_delete=models.CASCADE)
+	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+	quantity = models.IntegerField()
 
 ## Product Response Type
 	name = models.CharField(max_length=100)
@@ -83,17 +87,17 @@
 ###### UPDATE: PUT /users/{username}/ :heavy_check_mark:
 ###### DELETE: DELETE /users/{username}/ :heavy_check_mark:
 
-###### GET WISHLIST OF USER: GET /users/{username}/wishlist/:heavy_check_mark:
-###### ADD TO USER WISHLIST: POST /users/{username}/wishlist/
-###### REMOVE FROM USER WISHLIST: DELETE /users/{username}/wishlist/{product-id}/
+###### GET WISHLIST OF USER: GET /users/{username}/wishlist/ :heavy_check_mark:
+###### ADD TO USER WISHLIST: POST /users/{username}/wishlist/ :heavy_check_mark:
+###### REMOVE FROM USER WISHLIST: DELETE /users/{username}/wishlist/{product-id}/ :heavy_check_mark:
 
 ###### GET CART OF USER: GET /users/{username}/cart/ :heavy_check_mark:
-###### ADD TO USER CART: POST /users/{username}/cart/
-###### MODIFY QTY IN USER CART: PUT /users/{username}/cart/{product-id}/
-###### REMOVE FROM USER CART: DELETE /users/{username}/cart/{product-id}/
+###### ADD TO USER CART: POST /users/{username}/cart/ :heavy_check_mark:
+###### MODIFY QTY IN USER CART: PUT /users/{username}/cart/{product-id}/ :heavy_check_mark:
+###### REMOVE FROM USER CART: DELETE /users/{username}/cart/{product-id}/ :heavy_check_mark:
 
-###### GET ALL PRODUCTS SOLD BY USER: GET /users/{username}/products/
-###### DELETE ALL PRODUCTS SOLD BY USER: DELETE /users/{username}/products/
+###### GET ALL PRODUCTS SOLD BY USER: GET /users/{username}/products/ :heavy_check_mark:
+###### DELETE ALL PRODUCTS SOLD BY USER: DELETE /users/{username}/products/ :heavy_check_mark:
 
 ###### GET ALL ORDERS OF BUYER: GET /users/{username}/orders/ :heavy_check_mark:
 ###### DELETE ALL ORDERS OF BUYER: DELETE /users/{username}/orders/ :heavy_check_mark:
