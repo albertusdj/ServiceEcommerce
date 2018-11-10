@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
-from eCommerceApp.models import User, Product, Wishlist, Cart, Order, ProductResponse, Promotion
+from eCommerceApp.models import User, Product, Wishlist, Cart, OrderStatus, Order, ProductResponseType, ProductResponse, Promotion
 
 import json
 from urllib import parse as urlparse
@@ -130,10 +130,9 @@ class ProductsView(View):
 
 		# TO-DO : VALIDATION
 		username = body['username']
-		if (User.objects.filter(username=username).count()>0):
-			return HttpResponse(status=403)
+		user = get_object_or_404(User, username=username)
 		data = {}
-		data['username'] = body['username']
+		data['user'] = user
 		try :
 			data['name'] = body['name']
 		except:
@@ -358,7 +357,7 @@ class BuyerOrder(View):
 class ProductResponsesView(View):
 	# Product Responses Index
 	def get(self, request):
-		product_responses = ProductResponse.object.all()
+		product_responses = ProductResponse.objects.all()
 		response = serializers.serialize('json', product_responses)
 		return HttpResponse(response)
 	# Create Product Response
@@ -430,7 +429,7 @@ class ProductResponseView(View):
 class PromotionsView(View):
 	# Promotions Index
 	def get(self, request):
-		promotions = ProductResponse.object.all()
+		promotions = Promotion.objects.all()
 		response = serializers.serialize('json', promotions)
 		return HttpResponse(response)
 	# Create Promotion
@@ -446,8 +445,9 @@ class PromotionsView(View):
 			body = json.loads(json_string)
 
 		product_id = body['product_id']
+		product = get_object_or_404(Product, id=product_id)
 		data = {}
-		data['product_id'] = product_id
+		data['product'] = product
 		try:
 			data['name'] = body['name']
 		except:
@@ -463,14 +463,14 @@ class PromotionsView(View):
 class PromotionView(View):
 	# Show Specific Promotion
 	def get(self, request, promotion_id):
-		promotion = get_object_or_404(promotion, pk=promotion_id)
+		promotion = get_object_or_404(Promotion, id=promotion_id)
 		if promotion :
 			response = serializers.serialize('json', [promotion])
 		return HttpResponse(response)
 
 	# Update Specific Promotion
 	def put(self, request, promotion_id):
-		promotion = get_object_or_404(Order, pk=promotion_id)
+		promotion = get_object_or_404(Promotion, pk=promotion_id)
 		query_string = request.body.decode('utf-8')
 		try:
 			# u/ text, text/plain, application/json
@@ -494,6 +494,6 @@ class PromotionView(View):
 
 	# Delete Specific Promotion
 	def delete(self,request,promotion_id):
-		promotion = get_object_or_404(Order, pk=promotion_id)
+		promotion = get_object_or_404(Promotion, pk=promotion_id)
 		promotion.delete()
 		return HttpResponse(status=204)

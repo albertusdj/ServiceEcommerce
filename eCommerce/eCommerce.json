@@ -1,0 +1,103 @@
+[
+  {
+    "model": "eCommerceApp.productresponsetype",
+    "pk": 1,
+    "fields": {
+      "name": "RATING"
+    }
+  },
+  {
+    "model": "eCommerceApp.productresponsetype",
+    "pk": 2,
+    "fields": {
+      "name": "REVIEW"
+    }
+  },
+  {
+    "model": "eCommerceApp.productresponsetype",
+    "pk": 3,
+    "fields": {
+      "name": "DISCUSSION"
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 1,
+    "fields": {
+      "name": "PENDING",
+      "description": "Menunggu pembayaran."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 2,
+    "fields": {
+      "name": "FAILED",
+      "description": "Order dibatalkan karena pembayaran."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 3,
+    "fields": {
+      "name": "PAID",
+      "description": "Pembayaran diterima. Seller telah menerima notifikasi order."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 4,
+    "fields": {
+      "name": "CONFIRMED",
+      "description": "Seller sedang mempersiapkan barang untuk dikirim."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 5,
+    "fields": {
+      "name": "SHIPPED",
+      "description": "Seller telah mengirim barang."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 6,
+    "fields": {
+      "name": "CANCELED",
+      "description": "Order dibatalkan."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 7,
+    "fields": {
+      "name": "RECEIVED",
+      "description": "Barang telah diterima. Langkah selanjutnya: rating atau refund"
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 8,
+    "fields": {
+      "name": "FINISHED",
+      "description": "Order selesai."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 9,
+    "fields": {
+      "name": "REFUND IN PROGRESS",
+      "description": "Seller telah menerima notifikasi refund."
+    }
+  },
+  {
+    "model": "eCommerceApp.orderstatus",
+    "pk": 10,
+    "fields": {
+      "name": "REFUND SUCCESSFUL",
+      "description": "Refund selesai."    
+    }
+  }  
+]

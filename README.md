@@ -19,9 +19,10 @@
 
 ###### 6. `python manage.py makemigrations`
 ###### 7. `python manage.py migrate`
-###### 8. `python manage.py runserver`
-###### 9. to access sqlite db `python manage.py dbshell`
-###### 10. `source deactivate`
+###### 8. `python manage.py loaddata eCommerce.json`
+###### 9. `python manage.py runserver`
+###### 10. to access sqlite db `python manage.py dbshell`
+###### 111. `source deactivate`
 
 # MODELS
 ## User
@@ -33,6 +34,7 @@
 ## Product
 	user = models.ForeignKey(User, on_delete=models.CASCADE) 
 	name = models.CharField(max_length=100) description = models.CharField(max_length=100, default="")
+	description = models.CharField(max_length=100, default="")
 	price = models.FloatField(default=0)
 	quantity = models.IntegerField(default=0)
 
@@ -46,23 +48,32 @@
 	quantity = models.IntegerField()
 	subtotal = models.FloatField(default=0)
 
+## Order Status
+	name = models.CharField(max_length=100)
+	description = models.CharField(max_length=500)
+
 ## Order
-	order = models.ForeignKey(User, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	quantity = models.IntegerField()
 	total = models.FloatField(default=0)
-	status = models.CharField(max_length=100)
+	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
 
-## ProductResponse
+## Product Response Type
+	name = models.CharField(max_length=100)
+
+## Product Response
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
+	response_type = models.ForeignKey(ProductResponseType, on_delete=models.CASCADE)
 	content = models.CharField(max_length=500, default="")
 
 ## Promotion
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	name = content = models.CharField(max_length=100)
 	content = models.CharField(max_length=1000, default="")
+	is_valid = models.BooleanField(default=True)
 
 # ENDPOINTS (notice trailing slash)
 ## User
@@ -95,11 +106,11 @@
 ###### DELETE ALL RESPONSES OF BUYER: /users/{username}/responses/
 
 ## Product
-###### INDEX: GET /products/
-###### CREATE: POST /products/
-###### SHOW: GET /products/{product-id}/
-###### UPDATE: PUT /products/{product-id}/
-###### DELETE: DELETE /products/{product-id}/
+###### INDEX: GET /products/ :heavy_check_mark:
+###### CREATE: POST /products/ :heavy_check_mark:
+###### SHOW: GET /products/{product-id}/ :heavy_check_mark:
+###### UPDATE: PUT /products/{product-id}/ :heavy_check_mark:
+###### DELETE: DELETE /products/{product-id}/ :heavy_check_mark:
 
 ###### GET RESPONSES OF PRODUCT: GET /products/{product-id}/responses/
 ###### DELETE ALL RESPONSES OF PRODUCT: DELETE /products/{product-id}/responses/

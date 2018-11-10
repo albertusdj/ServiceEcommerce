@@ -23,20 +23,29 @@ class Cart(models.Model):
 	quantity = models.IntegerField()
 	subtotal = models.FloatField(default=0)
 
+class OrderStatus(models.Model):
+	name = models.CharField(max_length=100)
+	description = models.CharField(max_length=500)
+
 class Order(models.Model):
 	order = models.ForeignKey(User, on_delete=models.CASCADE)
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	quantity = models.IntegerField()
 	total = models.FloatField(default=0)
-	status = models.CharField(max_length=100)
+	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
+
+class ProductResponseType(models.Model):
+	name = models.CharField(max_length=100)
 
 class ProductResponse(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
+	response_type = models.ForeignKey(ProductResponseType, on_delete=models.CASCADE)
 	content = models.CharField(max_length=500, default="")
 
 class Promotion(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	name = content = models.CharField(max_length=100)
 	content = models.CharField(max_length=1000, default="")
+	is_valid = models.BooleanField(default=True)
