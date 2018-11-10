@@ -2,20 +2,20 @@
 1. `git clone http://gitlab.informatika.org/albertusdj/ServiceEcommerce`
 2. `cd ServiceEcommerce`
 3. `conda create environment -f yml`
-4.`activate ppls`. bash/sudo: `source activate ppls`
-5. `nano eCommerce/eCommerce/settings.py`
-`INSTALLED_APPS = [
-    ...
-    'eCommerceApp',
-
-]
-...
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}`
+4. `activate ppls`. bash/sudo: `source activate ppls`
+5. `nano eCommerce/eCommerce/settings.py`  
+`INSTALLED_APPS = [`  
+&nbsp;&nbsp;&nbsp;&nbsp;`...`  
+&nbsp;&nbsp;&nbsp;&nbsp;`'eCommerceApp',`  
+&nbsp;&nbsp;&nbsp;&nbsp;`    `  
+&nbsp;&nbsp;&nbsp;`]`  
+`...`  
+`DATABASES = {`  
+&nbsp;&nbsp;&nbsp;&nbsp;`'default': {`  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`'ENGINE': 'django.db.backends.sqlite3',`  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),`  
+&nbsp;&nbsp;&nbsp;&nbsp;`}`  
+`}`  
 
 6. `python manage.py makemigrations`
 7. `python manage.py migrate`
