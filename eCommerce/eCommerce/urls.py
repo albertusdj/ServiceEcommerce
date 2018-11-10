@@ -19,14 +19,49 @@ from eCommerceApp.views import *
 urlpatterns = [
 	# Karena pake wildcard, urutannya harus diperhatiin. regex yg lebih spesifik diatas!
 
-	#url(r'^tes/$', views.tes),
+	#ct: /tes/
+	#url(r'^tes/$', tes),
 
+	###################################################################################################################
+	#
+	# User
+	#
+	###################################################################################################################
+
+	#ct: /users/
 	url(r'^users/$', UsersView.as_view()),
-	url(r'^users/(?P<username>.+)/wishlist/$', WishlistView.as_view()),
-	url(r'^users/(?P<username>.+)/cart/$', CartView.as_view()),
+	#ct: /users/user1/wishlist/
+	url(r'^users/(?P<username>.+)/wishlist/$', UserWishlist.as_view()),
+	#ct: /users/user1/cart/
+	url(r'^users/(?P<username>.+)/cart/$', UserCart.as_view()),
+	#ct: /users/user1/
 	url(r'^users/(?P<username>.+)/$', UserView.as_view()),
 
+	###################################################################################################################
+	#
+	# Product
+	#
+	###################################################################################################################
+	#ct: /products/
+	url(r'^products/$', ProductsView.as_view()),
+	#ct: /products/product1/
+	url(r'^products/(?P<product_id>[0-9]+)/$', ProductView.as_view()),
+
+	###################################################################################################################
+	#
+	# Wishlist
+	#
+	###################################################################################################################
+	#ct: /wishlists/
 	url(r'^wishlists/$', WishlistsView.as_view()),
+
+	###################################################################################################################
+	#
+	# Cart
+	#
+	###################################################################################################################
+
+	#ct: /carts/
 	url(r'^carts/$', CartsView.as_view()),
 
 ]
