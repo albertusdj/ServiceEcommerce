@@ -1,4 +1,4 @@
-package com.eCommerce.service.Refund;
+package com.eCommerce.service.handleOrder;
 
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -22,7 +22,7 @@ public class InMemoryH2Test {
   @Rule
   public static ProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create().build();
 
-  private static final String PROCESS_DEFINITION_KEY = "Refund";
+  private static final String PROCESS_DEFINITION_KEY = "handleOrder";
 
   static {
     LogFactory.useSlf4jLogging(); // MyBatis

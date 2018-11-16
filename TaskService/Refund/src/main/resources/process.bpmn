@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
   <bpmn:process id="Refund" name="Refund" isExecutable="true">
     <bpmn:startEvent id="StartEventProcessStarted" name="Pembeli ingin refund produk">
       <bpmn:outgoing>SequenceFlow_0cjjjit</bpmn:outgoing>
       <bpmn:messageEventDefinition messageRef="Message_0q3oj80" />
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0cjjjit" sourceRef="StartEventProcessStarted" targetRef="Task_0397yri" />
-    <bpmn:serviceTask id="Task_0397yri" name="Cek Order Status" camunda:class="/Refund/src/main/java/com/ecommerce/service/Refund/RefundDelegate.java">
+    <bpmn:serviceTask id="Task_0397yri" name="Cek Order Status" camunda:class="com.eCommerce.service.Refund.RefundDelegate">
       <bpmn:incoming>SequenceFlow_0cjjjit</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_18v4a21</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -25,7 +25,7 @@
     <bpmn:userTask id="Task_1c5u1ze" name="Penjual konfirmasi refund produk">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="RefundConfirmation" label="Are you sure to refund?" type="boolean" />
+          <camunda:formField id="konfirmasi" label="Are you sure to refund?" type="boolean" defaultValue="false" />
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0ggbe0j</bpmn:incoming>
@@ -41,12 +41,12 @@
       <bpmn:incoming>SequenceFlow_1wuwabi</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1wuwabi" name="no" sourceRef="ExclusiveGateway_0i7qr2h" targetRef="EndEvent_1xq29wf">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not RefundConfirmation}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{konfirmasi == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="SequenceFlow_183vyov" name="yes" sourceRef="ExclusiveGateway_0i7qr2h" targetRef="Task_0f3htyi">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{RefundConfirmation}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{konfirmasi == true}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="Task_0f3htyi" name="Refund uang ke pembeli" camunda:class="/Refund/src/main/java/com/ecommerce/service/Refund/RefundPayment.java">
+    <bpmn:serviceTask id="Task_0f3htyi" name="Refund uang ke pembeli" camunda:class="com.eCommerce.service.Refund.RefundPayment">
       <bpmn:incoming>SequenceFlow_183vyov</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0wg0v4l</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -55,7 +55,7 @@
       <bpmn:incoming>SequenceFlow_0uwchez</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0uwchez" sourceRef="Task_178jf06" targetRef="EndEvent_0jbijy2" />
-    <bpmn:sendTask id="Task_178jf06" name="Notifkasi refund ke penjual" camunda:class="com.ecommerce.service.Refund.LoggerDelegate">
+    <bpmn:sendTask id="Task_178jf06" name="Notifkasi refund ke penjual" camunda:class="com.eCommerce.service.Refund.LoggerDelegate">
       <bpmn:incoming>SequenceFlow_0wg0v4l</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0uwchez</bpmn:outgoing>
     </bpmn:sendTask>

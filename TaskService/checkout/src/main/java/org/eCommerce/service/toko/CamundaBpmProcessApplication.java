@@ -1,4 +1,4 @@
-package com.eCommerce.service.Refund;
+package org.eCommerce.service.toko;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 @ProcessApplication
 public class CamundaBpmProcessApplication extends ServletProcessApplication {
 
-  private static final String PROCESS_DEFINITION_KEY = "Refund";
+  private static final String PROCESS_DEFINITION_KEY = "toko";
 
   /**
    * In a @PostDeploy Hook you can interact with the process engine and access 
