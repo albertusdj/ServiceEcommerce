@@ -196,7 +196,8 @@ class UserProduct(View):
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
 		products = Product.objects.filter(user=user)
-		response = serializers.serialize('json', products) #for object
+		filtered = ProductFilter(request.GET, queryset=products)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 		
 	# Delete All
@@ -216,15 +217,17 @@ class WishlistsView(View):
 	# Wishlists Index
 	def get(self, request):
 		wishlists = Wishlist.objects.all() #queryset
-		response = serializers.serialize('json', wishlists) #u/ queryset
+		filtered = WishlistFilter(request.GET, queryset=wishlists)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
 class UserWishlist(View):
 	# User wishlist
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
-		wishlist = Wishlist.objects.filter(user=user)
-		response = serializers.serialize('json', wishlist) #for object
+		wishlists = Wishlist.objects.filter(user=user)
+		filtered = WishlistFilter(request.GET, queryset=wishlists)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
 	# Add to wishlist
@@ -255,15 +258,17 @@ class CartsView(View):
 	# Carts Index
 	def get(self, request):
 		carts = Cart.objects.all() #queryset
-		response = serializers.serialize('json', carts) #u/ queryset
+		filtered = CartFilter(request.GET, queryset=carts)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
 class UserCart(View):
 	# User cart
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
-		cart = Cart.objects.filter(user=user)
-		response = serializers.serialize('json', cart) #for object
+		carts = Cart.objects.filter(user=user)
+		filtered = CartFilter(request.GET, queryset=carts)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
 	# Add to cart
@@ -317,6 +322,8 @@ class OrdersView(View):
 	# Orders Index
 	def get(self, request):
 		orders = Order.objects.all()
+		#filtered = OrderFilter(request.GET, queryset=orders)
+		#response = serializers.serialize('json', filtered.qs)
 		response = serializers.serialize('json', orders)
 		return HttpResponse(response)
 
@@ -336,12 +343,22 @@ class OrdersView(View):
 		order = Order(**data)
 		order.save()
 
-		products = body['products_id']
-		quantities = body['quantities']
-		for (product_id, quantity) in zip(products,quantities) :
-			product = get_object_or_404(Product,pk=product_id)
-			order.total += product.price * quantity
+		orderProducts = body['products']
+		for orderProduct in orderProducts :
+			product = get_object_or_404(Product,pk=orderProduct.id)
+			quantity = orderProduct.quantity
 			op = OrderProduct(order=order,product=product, quantity=quantity)
+			subtotal += product.price * quantity
+			try:
+				promotion = get_object_or_404(Promotion,pk=orderProduct.promotion_id)
+				op.promotion = promotion
+				if (promotion.discount!=0):
+					subtotal -= promotion.discount
+				else :
+					subtotal -= subtotal * promotion.discount_percentage
+			except:
+				pass
+			order.total+=subtotal
 			op.save()
 		order.save()
 		response = serializers.serialize('json', [order])
@@ -524,7 +541,8 @@ class PromotionsView(View):
 	# Promotions Index
 	def get(self, request):
 		promotions = Promotion.objects.all()
-		response = serializers.serialize('json', promotions)
+		filtered = PromotionFilter(request.GET, queryset=promotions)
+		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
 	# Create Promotion
@@ -541,9 +559,13 @@ class PromotionsView(View):
 		except:
 			pass
 		try:
-			data['content'] = body['content']
+			data['description'] = body['description']
 		except:
 			pass
+		try:
+			data['discount'] = body['discount']
+		except:
+			data['discount_percentage'] = body['discount_percentage']
 		try:
 			data['is_valid'] = body['is_valid']
 		except:

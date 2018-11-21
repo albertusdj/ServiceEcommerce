@@ -23,10 +23,10 @@ urlpatterns = [
 	#url(r'^tes/$', tes),
 
 	#cr: /order-status/
-	url(r'^order-status/$', searchOrderStatus),
+	url(r'^status/$', searchOrderStatus),
 
 	#cr: /response-types/
-	url(r'^response-types/$', searchProductResponseTypes),
+	url(r'^types/$', searchProductResponseTypes),
 	
 	###################################################################################################################
 	#

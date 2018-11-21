@@ -29,14 +29,9 @@ class OrderStatus(models.Model):
 
 class Order(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	products = models.ManyToManyField(Product, through='OrderProduct')
+	products = models.ManyToManyField(Product, through='OrderProduct', related_name='order_products')
 	total = models.FloatField(default=0)
 	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
-
-class OrderProduct(models.Model):
-	order = models.ForeignKey(Order, on_delete=models.CASCADE)
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	quantity = models.IntegerField()
 	
 class ProductResponseType(models.Model):
 	name = models.CharField(max_length=100)
@@ -51,5 +46,13 @@ class ProductResponse(models.Model):
 class Promotion(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 	name = content = models.CharField(max_length=100)
-	content = models.CharField(max_length=1000, default="")
+	description = models.CharField(max_length=1000, default="")
+	discount = models.IntegerField(default=0)
+	discount_percentage = models.FloatField(default=0)
 	is_valid = models.BooleanField(default=True)
+
+class OrderProduct(models.Model):
+	order = models.ForeignKey(Order, on_delete=models.CASCADE)
+	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+	quantity = models.IntegerField()
+	promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE, null=True)
