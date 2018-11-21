@@ -74,13 +74,13 @@ class OrderFilter(django_filters.FilterSet):
     pk = django_filters.NumberFilter(field_name='id')
     user = user_id = django_filters.NumberFilter(field_name='user_id')
     username = django_filters.CharFilter(lookup_expr='icontains', field_name='user__username')
-    product = product_id = django_filters.NumberFilter(field_name='orderproduct__product_id')
-    product_name = django_filters.CharFilter(lookup_expr='icontains', field_name='orderproduct__product__name')
+    product = product_id = django_filters.NumberFilter(field_name='orderdetail__product_id')
+    product_name = django_filters.CharFilter(lookup_expr='icontains', field_name='orderdetail__product__name')
     total = django_filters.NumberFilter()
     max_total = django_filters.NumberFilter(field_name='total', lookup_expr='lte')
     min_total = django_filters.NumberFilter(field_name='total', lookup_expr='gte')
-    promotion = promotion_id = django_filters.NumberFilter(field_name='orderproduct__promotion_id')
-    promotion_name = django_filters.CharFilter(lookup_expr='icontains', field_name='orderproduct__promotion__name')
+    promotion = promotion_id = django_filters.NumberFilter(field_name='orderdetail__promotion_id')
+    promotion_name = django_filters.CharFilter(lookup_expr='icontains', field_name='orderdetail__promotion__name')
     
     class Meta:
         model = Order

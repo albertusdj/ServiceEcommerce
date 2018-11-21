@@ -360,30 +360,30 @@ class OrdersView(View):
 		order = Order(**data)
 		order.save()
 
-		orderProducts = body['details']
-		for orderProduct in orderProducts:
-			data_op={}
-			data_op['order'] = order
-			product_id = orderProduct['id'];
+		orderDetails = body['details']
+		for orderDetail in orderDetails:
+			data_d={}
+			data_d['order'] = order
+			product_id = orderDetail['id'];
 			product = get_object_or_404(Product, pk=product_id)
-			data_op['product'] = product
-			quantity = orderProduct['quantity']
-			data_op['quantity'] = quantity
+			data_d['product'] = product
+			quantity = orderDetail['quantity']
+			data_d['quantity'] = quantity
 			subtotal = product.price * quantity
 			try:
-				promotion_id = orderProduct['promotion_id'];
+				promotion_id = orderDetail['promotion_id'];
 			except:
 				promotion_id = None
 			if (promotion_id):
 				promotion = get_object_or_404(Promotion, pk=promotion_id, product_id=product_id)
-				data_op['promotion'] = promotion
+				data_d['promotion'] = promotion
 				if (promotion.is_valid):
 					if (promotion.discount!=0):
 						subtotal -= promotion.discount
 					else :
 						subtotal -= subtotal * promotion.discount_percentage		
-			op = OrderProduct(**data_op)
-			op.save()
+			d = OrderDetail(**data_d)
+			d.save()
 			order.total+= subtotal
 		order.save()
 		response = serializers.serialize('json', [order])
@@ -416,12 +416,12 @@ class OrderView(View):
 		order.delete()
 		return HttpResponse(status=204)
 
-class OrderProductsView(View):
+class OrderDetailsView(View):
 	# Order Products Index
 	def get(self, request, order_id):
 		order = get_object_or_404(Order, pk=order_id)
-		orderProducts = OrderProduct.objects.filter(order=order)
-		filtered = ProductFilter(request.GET, queryset=orderProducts)
+		orderDetails = get_object_or_404(Order, pk=order_id)
+		filtered = ProductFilter(request.GET, queryset=orderDetails)
 		validate_search(request,filtered)
 		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
@@ -543,16 +543,7 @@ class ProductResponseView(View):
 		product_response = get_object_or_404(ProductResponse, pk=response_id)
 		query_string = request.body.decode('utf-8')
 		body = json.loads(query_string)
-		try:
-			product_response.description = body['description']
-		except:
-			pass
-		try:
-			product_response.discount = body['discount']
-			product_response.discount_percentage = 0
-		except:
-			product_response.discount= 0
-			product_response.discount_percentage = body['discount_percentage']
+		promotion.content = body['content']
 		product_response.save()
 		response = serializers.serialize('json', [product_response])
 		return HttpResponse(response)
@@ -604,10 +595,7 @@ class PromotionsView(View):
 		product = get_object_or_404(Product, id=product_id)
 		data = {}
 		data['product'] = product
-		try:
-			data['name'] = body['name']
-		except:
-			pass
+		data['name'] = body['name']
 		try:
 			data['description'] = body['description']
 		except:
@@ -639,10 +627,6 @@ class PromotionView(View):
 		query_string = request.body.decode('utf-8')
 		body = json.loads(query_string)
 		try:
-			promotion.content = body['content']
-		except:
-			pass
-		try:
 			promotion.name = body['name']
 		except:
 			pass
@@ -650,6 +634,16 @@ class PromotionView(View):
 			promotion.is_valid = body['is_valid']
 		except:
 			pass
+		try:
+			product_response.description = body['description']
+		except:
+			pass
+		try:
+			product_response.discount = body['discount']
+			product_response.discount_percentage = 0
+		except:
+			product_response.discount= 0
+			product_response.discount_percentage = body['discount_percentage']
 		promotion.save()
 		response = serializers.serialize('json', [promotion])
 		return HttpResponse(response)
