@@ -2,7 +2,7 @@
 ###### 1. `git clone http://gitlab.informatika.org/albertusdj/ServiceEcommerce`
 ###### 2. `cd ServiceEcommerce`
 ###### 3. `conda create environment -f yml`
-###### 4. `activate ppls`. bash/sudo: `source activate ppls`
+###### 4. `activate ppls`. bash/sudo: `source activate ppls`. Tanpa conda: `cd ppls/bin/` jalanin `activate ppls`
 ###### 5. `nano eCommerce/eCommerce/settings.py`
 	INSTALLED_APPS = [  
 		...  
@@ -26,58 +26,70 @@
 
 # MODELS
 ## User
-	username = models.CharField(max_length=100, unique=True)
-	name = models.CharField(max_length=100, default="")
-	password = models.CharField(max_length=100)
-	address = models.CharField(max_length=100, default="")
+    class User(models.Model):
+	    username = models.CharField(max_length=100, unique=True)
+	    name = models.CharField(max_length=100, default="")
+	    password = models.CharField(max_length=100)
+	    address = models.CharField(max_length=100, default="")
 
 ## Product
-	user = models.ForeignKey(User, on_delete=models.CASCADE) 
-	name = models.CharField(max_length=100) description = models.CharField(max_length=100, default="")
-	description = models.CharField(max_length=100, default="")
-	price = models.FloatField(default=0)
-	quantity = models.IntegerField(default=0)
+    class Product(models.Model):
+    	user = models.ForeignKey(User, on_delete=models.CASCADE)
+    	name = models.CharField(max_length=100)
+    	description = models.CharField(max_length=100, default="")
+    	price = models.FloatField(default=0)
+    	quantity = models.IntegerField(default=0)
 
 ## Wishlist
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    class Wishlist(models.Model):
+    	user = models.ForeignKey(User, on_delete=models.CASCADE)
+    	product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
 ## Cart
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	quantity = models.IntegerField()
-	subtotal = models.FloatField(default=0)
+    class Cart(models.Model):
+    	user = models.ForeignKey(User, on_delete=models.CASCADE)
+    	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    	quantity = models.IntegerField(default=1)
+    	subtotal = models.FloatField(default=0)
 
 ## Order Status
-	name = models.CharField(max_length=100)
-	description = models.CharField(max_length=500)
+    class OrderStatus(models.Model):
+    	name = models.CharField(max_length=100)
+    	description = models.CharField(max_length=500)
 
 ## Order
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	products = models.ManyToManyField(Product, through='OrderProduct')
-	total = models.FloatField(default=0)
-	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
+    class Order(models.Model):
+    	user = models.ForeignKey(User, on_delete=models.CASCADE)
+    	total = models.FloatField(default=0)
+    	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
 
-## OrderProduct
-	order = models.ForeignKey(Order, on_delete=models.CASCADE)
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	quantity = models.IntegerField()
+## Order Detail
+    class OrderDetail(models.Model):
+    	order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    	quantity = models.IntegerField()
+    	promotion = models.ForeignKey(Promotion,on_delete=models.CASCADE,null=True)
 
 ## Product Response Type
-	name = models.CharField(max_length=100)
+    class ProductResponseType(models.Model):
+    	name = models.CharField(max_length=100)
 
 ## Product Response
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
-	response_type = models.ForeignKey(ProductResponseType, on_delete=models.CASCADE)
-	content = models.CharField(max_length=500)
+    class ProductResponse(models.Model):
+    	user = models.ForeignKey(User, on_delete=models.CASCADE)
+    	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    	order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
+    	response_type = models.ForeignKey(ProductResponseType, on_delete=models.CASCADE)
+    	content = models.CharField(max_length=500)
 
 ## Promotion
-	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	name = content = models.CharField(max_length=100)
-	content = models.CharField(max_length=1000, default="")
-	is_valid = models.BooleanField(default=True)
+    class Promotion(models.Model):
+    	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    	name = models.CharField(max_length=100)
+    	description = models.CharField(max_length=1000, default="")
+    	discount = models.IntegerField(default=0)
+    	discount_percentage = models.FloatField(default=0)
+    	is_valid = models.BooleanField(default=True)
 
 # ENDPOINTS (notice trailing slash)
 ## User
@@ -160,21 +172,33 @@
 ## Order
 ###### INDEX: GET /orders/ :heavy_check_mark:
 ###### CREATE: POST /orders/ :heavy_check_mark:
-	{
-		   "username":"admin",
-		   "products_id": [1,2],
-		   "quantities": [9,10],
-		   "status_id":2
-	}
+    {
+        "username":"user",
+        "details":[
+            {
+                "id":1,
+                "quantity":1,
+                "promotion_id":1
+            },
+            {
+                "id":2,
+                "quantity":3
+            }
+        ],
+        "status_id":2
+    }
 	status opsional, status default = "pending", total diitung otomatis
 ###### SHOW: GET /orders/{order-id}/ :heavy_check_mark:
 ###### UPDATE: PUT /orders/{order-id}/ :heavy_check_mark:
 	{
 		   "status_id":3,
-		   "total":20
 	}
-	yg bisa diganti cmn status ma total(biar promotion bs ngurangin harga)
+	yg bisa diganti cmn status (update status)
 ###### DELETE: DELETE /orders/{order-id}/ :heavy_check_mark:
+
+## OrderDetail
+###### GET DETAILS OF ORDER: GET /orders/{order-id}/details :heavy_check_mark:
+
 
 ## ProductResponse
 ###### INDEX: GET /responses/ :heavy_check_mark:
@@ -200,15 +224,17 @@
 ###### CREATE: POST /promotions/ :heavy_check_mark:
 	{
 		"product_id":1,
-		"name":"diskonkaos"
+		"name":"diskonkaos",
+		"discount_percentage":0.25
 	}
-	default value silakan dilihat sendiri
+	default value silakan dilihat sendiri. kalo ada discount, percentage gak dilihat
 ###### SHOW: GET /promotions/{promotion-id}/ :heavy_check_mark:
 ###### UPDATE: PUT /promotions/{promotion-id}/ :heavy_check_mark:
 	{
-		"content":"no description",
+		"description":"udah abis kuotanya",
 		"is_valid":0
 	}
-	bisi mau ngeganti content, is_valid bs diganti biar ga valid lagi
+	bisi mau ngeganti description, is_valid bs diganti biar ga valid lagi, 
+	kalo ganti percentage, discount di-nolkan, sebaliknya kalo ganti discount, percentage di-nolkan.
 ###### DELETE: DELETE /promotions/{promotion-id}/ :heavy_check_mark:
 
