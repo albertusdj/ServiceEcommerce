@@ -232,7 +232,6 @@ class WishlistsView(View):
 	def get(self, request):
 		wishlists = Wishlist.objects.all() #queryset
 		filtered = WishlistFilter(request.GET,queryset=wishlists)
-		print(filtered.qs)
 		validate_search(request,filtered)
 		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
@@ -361,13 +360,31 @@ class OrdersView(View):
 		order = Order(**data)
 		order.save()
 
-		products = body['products_id']
-		quantities = body['quantities']
-		for (product_id, quantity) in zip(products,quantities) :
-			product = get_object_or_404(Product,pk=product_id)
-			order.total += product.price * quantity
-			op = OrderProduct(order=order,product=product, quantity=quantity)
+		orderProducts = body['details']
+		for orderProduct in orderProducts:
+			data_op={}
+			data_op['order'] = order
+			product_id = orderProduct['id'];
+			product = get_object_or_404(Product, pk=product_id)
+			data_op['product'] = product
+			quantity = orderProduct['quantity']
+			data_op['quantity'] = quantity
+			subtotal = product.price * quantity
+			try:
+				promotion_id = orderProduct['promotion_id'];
+			except:
+				promotion_id = None
+			if (promotion_id):
+				promotion = get_object_or_404(Promotion, pk=promotion_id, product_id=product_id)
+				data_op['promotion'] = promotion
+				if (promotion.is_valid):
+					if (promotion.discount!=0):
+						subtotal -= promotion.discount
+					else :
+						subtotal -= subtotal * promotion.discount_percentage		
+			op = OrderProduct(**data_op)
 			op.save()
+			order.total+= subtotal
 		order.save()
 		response = serializers.serialize('json', [order])
 		return HttpResponse(response)
@@ -384,11 +401,6 @@ class OrderView(View):
 		order = get_object_or_404(Order, pk=order_id)
 		query_string = request.body.decode('utf-8')
 		body = json.loads(query_string)
-		print(body)
-		try:
-			order.total = body['total']
-		except:
-			pass
 		try:
 			status_id = body['status_id']
 			order.status = get_object_or_404(OrderStatus,pk=status_id)
@@ -403,6 +415,16 @@ class OrderView(View):
 		order = get_object_or_404(Order, pk=order_id)
 		order.delete()
 		return HttpResponse(status=204)
+
+class OrderProductsView(View):
+	# Order Products Index
+	def get(self, request, order_id):
+		order = get_object_or_404(Order, pk=order_id)
+		orderProducts = OrderProduct.objects.filter(order=order)
+		filtered = ProductFilter(request.GET, queryset=orderProducts)
+		validate_search(request,filtered)
+		response = serializers.serialize('json', filtered.qs)
+		return HttpResponse(response)
 
 class BuyerOrder(View):
 	# Get All Order of Buyer
@@ -522,9 +544,15 @@ class ProductResponseView(View):
 		query_string = request.body.decode('utf-8')
 		body = json.loads(query_string)
 		try:
-			product_response.content = body['content']
+			product_response.description = body['description']
 		except:
 			pass
+		try:
+			product_response.discount = body['discount']
+			product_response.discount_percentage = 0
+		except:
+			product_response.discount= 0
+			product_response.discount_percentage = body['discount_percentage']
 		product_response.save()
 		response = serializers.serialize('json', [product_response])
 		return HttpResponse(response)
@@ -581,9 +609,13 @@ class PromotionsView(View):
 		except:
 			pass
 		try:
-			data['content'] = body['content']
+			data['description'] = body['description']
 		except:
 			pass
+		try:
+			data['discount'] = body['discount']
+		except:
+			data['discount_percentage'] = body['discount_percentage']
 		try:
 			data['is_valid'] = body['is_valid']
 		except:

@@ -98,6 +98,8 @@ urlpatterns = [
 
 	#ct: /orders/
 	url(r'^orders/?$',OrdersView.as_view()),
+	#ct: /orders/1/products/
+	url(r'^orders/(?P<order_id>[0-9]+)/details/?$',OrderProductsView.as_view()),
 	#ct: /orders/1/
 	url(r'^orders/(?P<order_id>[0-9]+)/?$',OrderView.as_view()),
 	

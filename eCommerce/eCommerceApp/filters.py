@@ -79,22 +79,31 @@ class OrderFilter(django_filters.FilterSet):
     total = django_filters.NumberFilter()
     max_total = django_filters.NumberFilter(field_name='total', lookup_expr='lte')
     min_total = django_filters.NumberFilter(field_name='total', lookup_expr='gte')
-
+    promotion = promotion_id = django_filters.NumberFilter(field_name='orderproduct__promotion_id')
+    promotion_name = django_filters.CharFilter(lookup_expr='icontains', field_name='orderproduct__promotion__name')
+    
     class Meta:
         model = Order
-        fields = ['id', 'pk', 'user', 'user_id', 'username', 'product', 'product_id', 'product_name', 'total', 'max_total', 'min_total', ]
+        fields = ['id', 'pk', 'user', 'user_id', 'username', 'product', 'product_id', 'product_name', 'total', 'max_total', 'min_total', 'promotion', 'promotion_id', 'promotion_name', ]
 
 class PromotionFilter(django_filters.FilterSet):
     pk = django_filters.NumberFilter(field_name='id')
     product = product_id = django_filters.NumberFilter(field_name='product_id')
     product_name = django_filters.CharFilter(lookup_expr='icontains', field_name='product__name')
     name = django_filters.CharFilter(lookup_expr='icontains')
-    content = django_filters.CharFilter(lookup_expr='icontains')
+    description = django_filters.CharFilter(lookup_expr='icontains')
     is_valid = django_filters.BooleanFilter(field_name='is_valid', widget=django_filters.widgets.BooleanWidget())
+    total = django_filters.NumberFilter()
+    max_discount = django_filters.NumberFilter(field_name='discount', lookup_expr='lte')
+    min_discount = django_filters.NumberFilter(field_name='discount', lookup_expr='gte')
+    discount_percentage = django_filters.NumberFilter()
+    max_discount_percentage = django_filters.NumberFilter(field_name='discount_percentage', lookup_expr='lte')
+    min_discount_percentage = django_filters.NumberFilter(field_name='discount_percentage', lookup_expr='gte')
 
     class Meta:
         model = Promotion
-        fields = ['id', 'pk', 'product', 'product_id', 'product_name', 'name', 'content', 'is_valid',]
+        fields = ['id', 'pk', 'product', 'product_id', 'product_name', 'name', 'description', 'is_valid', 'discount', 'max_discount', 
+        'min_discount', 'discount_percentage', 'max_discount_percentage', 'min_discount_percentage',]
 
 class ProductResponseFilter(django_filters.FilterSet):
     pk = django_filters.NumberFilter(field_name='id')
