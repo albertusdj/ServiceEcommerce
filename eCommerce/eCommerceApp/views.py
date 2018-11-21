@@ -1,9 +1,10 @@
 from django.core import serializers
 from django.db.models import Sum
 from django.shortcuts import render, get_object_or_404
+from django.http import Http404
 from django.views.generic import View
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from eCommerceApp.models import User, Product, Wishlist, Cart, OrderStatus, Order, ProductResponseType, ProductResponse, Promotion
 from eCommerceApp.filters import *
 
@@ -17,15 +18,24 @@ def tes(request):
 	return render(request, 'tes.html', c)
 '''
 
+def validate_search(request, filtered):
+	fields = filtered.Meta.fields
+	for key,value in request.GET.items():
+		if key not in fields:
+			raise Http404("Key "+key+" does not exist on model "+filtered.Meta.model.__name__+". Available keys are " + ",".join(fields))
+		return
+
 def searchOrderStatus(request):
 	status = OrderStatus.objects.all()
 	filtered = OrderStatusFilter(request.GET, queryset=status)
+	validate_search(request, filtered)
 	response = serializers.serialize('json', filtered.qs)
 	return HttpResponse(response)
 
 def searchProductResponseTypes(request):
 	response_types = ProductResponseType.objects.all()
 	filtered = ProductResponseTypeFilter(request.GET, queryset=response_types)
+	validate_search(request, filtered)
 	response = serializers.serialize('json', filtered.qs)
 	return HttpResponse(response)
 
@@ -34,11 +44,14 @@ def searchProductResponseTypes(request):
 # User
 #
 ###################################################################################################################
+
+
 class UsersView(View):
 	# Users Index
 	def get(self, request):
 		users = User.objects.all() #queryset
 		filtered = UserFilter(request.GET, queryset=users)
+		validate_search(request, filtered)
 		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
