@@ -283,6 +283,7 @@ class UserCart(View):
 	# User cart
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
+		carts = Cart.objects.filter(user=user)
 		filtered = CartFilter(request.GET,queryset=carts)
 		validate_search(request,filtered)
 		response = serializers.serialize('json', filtered.qs)
@@ -299,7 +300,7 @@ class UserCart(View):
 		try:
 			cart[0].quantity+=body['quantity']
 		except:
-			pass
+			cart[0].quantity=1
 		cart[0].subtotal = product.price * cart[0].quantity
 		cart[0].save()
 

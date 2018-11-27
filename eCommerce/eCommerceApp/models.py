@@ -20,7 +20,7 @@ class Wishlist(models.Model):
 class Cart(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	product = models.ForeignKey(Product, on_delete=models.CASCADE)
-	quantity = models.IntegerField(default=1)
+	quantity = models.IntegerField(default=0)
 	subtotal = models.FloatField(default=0)
 
 class OrderStatus(models.Model):
