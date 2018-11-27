@@ -283,6 +283,7 @@ class UserCart(View):
 	# User cart
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
+		carts =  get_object_or_404(Cart, user=user)
 		filtered = CartFilter(request.GET,queryset=carts)
 		validate_search(request,filtered)
 		response = serializers.serialize('json', filtered.qs)
