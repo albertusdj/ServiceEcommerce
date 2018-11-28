@@ -3,7 +3,8 @@ from django.db.models import Sum
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from django.views.generic import View
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.http import HttpResponse, HttpResponseNotFound
 from eCommerceApp.models import User, Product, Wishlist, Cart, OrderStatus, Order, ProductResponseType, ProductResponse, Promotion
 from eCommerceApp.filters import *
@@ -17,6 +18,11 @@ def tes(request):
 	c = request.__dict__
 	return render(request, 'tes.html', c)
 '''
+
+class CSRFExemptMixin(object):
+	@method_decorator(csrf_exempt)
+	def dispatch(self, *args, **kwargs):
+		return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
 
 def validate_search(request, filtered):
 	fields = filtered.Meta.fields
@@ -45,8 +51,7 @@ def searchProductResponseTypes(request):
 #
 ###################################################################################################################
 
-
-class UsersView(View):
+class UsersView(CSRFExemptMixin, View):
 	# Users Index
 	def get(self, request):
 		users = User.objects.all() #queryset
@@ -80,7 +85,7 @@ class UsersView(View):
 		response = serializers.serialize('json', [user])
 		return HttpResponse(response)
 
-class UserView(View):
+class UserView(CSRFExemptMixin, View):
 	# Show user
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -123,7 +128,7 @@ class UserView(View):
 # Product
 #
 ###################################################################################################################
-class ProductsView(View):
+class ProductsView(CSRFExemptMixin, View):
 	# Index
 	def get(self, request):
 		products = Product.objects.all() #queryset
@@ -163,7 +168,7 @@ class ProductsView(View):
 		response = serializers.serialize('json', [product])
 		return HttpResponse(response)
 
-class ProductView(View):
+class ProductView(CSRFExemptMixin, View):
 	# Show
 	def get(self, request, product_id):
 		product = get_object_or_404(Product, id=product_id) #object
@@ -205,7 +210,7 @@ class ProductView(View):
 		product.delete()
 		return HttpResponse(status=204)
 
-class UserProduct(View):
+class UserProduct(CSRFExemptMixin, View):
 	# Show All
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -227,7 +232,7 @@ class UserProduct(View):
 # Wishlist
 #
 ###################################################################################################################
-class WishlistsView(View):
+class WishlistsView(CSRFExemptMixin, View):
 	# Wishlists Index
 	def get(self, request):
 		wishlists = Wishlist.objects.all() #queryset
@@ -236,7 +241,7 @@ class WishlistsView(View):
 		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
-class UserWishlist(View):
+class UserWishlist(CSRFExemptMixin, View):
 	# User wishlist
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -270,7 +275,7 @@ class UserWishlist(View):
 # Cart
 #
 ###################################################################################################################
-class CartsView(View):
+class CartsView(CSRFExemptMixin, View):
 	# Carts Index
 	def get(self, request):
 		carts = Cart.objects.all() #queryset
@@ -279,7 +284,7 @@ class CartsView(View):
 		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
-class UserCart(View):
+class UserCart(CSRFExemptMixin, View):
 	# User cart
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -300,8 +305,8 @@ class UserCart(View):
 		try:
 			cart[0].quantity+=body['quantity']
 		except:
-			cart[0].quantity=1
-		cart[0].subtotal = product.price * cart[0].quantity
+			cart[0].quantity+=1
+		cart[0].subtotal += product.price * cart[0].quantity
 		cart[0].save()
 
 		response = serializers.serialize('json', [cart[0]])
@@ -336,7 +341,7 @@ class UserCart(View):
 # Order
 #
 ###################################################################################################################
-class OrdersView(View):
+class OrdersView(CSRFExemptMixin, View):
 	# Orders Index
 	def get(self, request):
 		orders = Order.objects.all()
@@ -390,7 +395,7 @@ class OrdersView(View):
 		response = serializers.serialize('json', [order])
 		return HttpResponse(response)
 
-class OrderView(View):
+class OrderView(CSRFExemptMixin, View):
 	# Show Specific Order Detail
 	def get(self, request, order_id):
 		order = get_object_or_404(Order, pk=order_id)
@@ -417,7 +422,7 @@ class OrderView(View):
 		order.delete()
 		return HttpResponse(status=204)
 
-class OrderDetailsView(View):
+class OrderDetailsView(CSRFExemptMixin, View):
 	# Order Products Index
 	def get(self, request, order_id):
 		order = get_object_or_404(Order, pk=order_id)
@@ -427,7 +432,7 @@ class OrderDetailsView(View):
 		response = serializers.serialize('json', filtered.qs)
 		return HttpResponse(response)
 
-class BuyerOrder(View):
+class BuyerOrder(CSRFExemptMixin, View):
 	# Get All Order of Buyer
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -444,7 +449,7 @@ class BuyerOrder(View):
 		order.delete()
 		return HttpResponse(status=204)
 
-class SellerOrder(View):
+class SellerOrder(CSRFExemptMixin, View):
 	# Get All Order of Seller
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -461,7 +466,7 @@ class SellerOrder(View):
 		order.delete()
 		return HttpResponse(status=204)
 
-class BuyerResponse(View):
+class BuyerResponse(CSRFExemptMixin, View):
 	# Get All response of Buyer
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -478,7 +483,7 @@ class BuyerResponse(View):
 		presponses.delete()
 		return HttpResponse(status=204)
 
-class SellerResponse(View):
+class SellerResponse(CSRFExemptMixin, View):
 	# Get All response of Seller
 	def get(self, request, username):
 		user = get_object_or_404(User, username=username) #object
@@ -501,7 +506,7 @@ class SellerResponse(View):
 #
 ###################################################################################################################
 
-class ProductResponsesView(View):
+class ProductResponsesView(CSRFExemptMixin, View):
 	# Product Responses Index
 	def get(self, request):
 		product_responses = ProductResponse.objects.all()
@@ -532,7 +537,7 @@ class ProductResponsesView(View):
 		response = serializers.serialize('json', [product_response])
 		return HttpResponse(response)
 
-class ProductResponseView(View):
+class ProductResponseView(CSRFExemptMixin, View):
 	# Show Specific Product Response
 	def get(self, request, response_id):
 		product_response = get_object_or_404(ProductResponse, pk=response_id)
@@ -555,7 +560,7 @@ class ProductResponseView(View):
 		product_response.delete()
 		return HttpResponse(status=204)
 
-class ProductProductResponse(View):
+class ProductProductResponse(CSRFExemptMixin, View):
 	# Show All
 	def get(self, request, product_id):
 		product = get_object_or_404(Product, pk=product_id) #object
@@ -578,7 +583,7 @@ class ProductProductResponse(View):
 #
 ###################################################################################################################
 
-class PromotionsView(View):
+class PromotionsView(CSRFExemptMixin, View):
 	# Promotions Index
 	def get(self, request):
 		promotions = Promotion.objects.all()
@@ -614,7 +619,7 @@ class PromotionsView(View):
 		response = serializers.serialize('json', [promotion])
 		return HttpResponse(response)
 
-class PromotionView(View):
+class PromotionView(CSRFExemptMixin, View):
 	# Show Specific Promotion
 	def get(self, request, promotion_id):
 		promotion = get_object_or_404(Promotion, id=promotion_id)
@@ -655,7 +660,7 @@ class PromotionView(View):
 		promotion.delete()
 		return HttpResponse(status=204)
 
-class ProductPromotion(View):
+class ProductPromotion(CSRFExemptMixin, View):
 	# Show All
 	def get(self, request, product_id):
 		product = get_object_or_404(Product, pk=product_id) #object
