@@ -10,7 +10,7 @@ from spyne.server.django import DjangoApplication
 from spyne.service import ServiceBase
 import base64, requests
 
-link = 'http://localhost:8080/engine-rest/message'
+link = 'http://127.0.0.1:8080/engine-rest/message'
 headers = {
     "Content-Type" : "application/json",
 }
@@ -31,7 +31,7 @@ class Checkout(ServiceBase):
         }
         print (data)
         r = requests.post(link, json=data, headers=headers)
-        return r
+        return r.status_code
         # return 'Hello, {}'.format(name)
 class HandleOrder(ServiceBase):
     @rpc(Integer(nillable=False), _returns=Integer)

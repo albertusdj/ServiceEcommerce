@@ -47,10 +47,10 @@ public class RefundPayment implements JavaDelegate {
 	
 	@Override
 	public void execute(DelegateExecution execution) throws Exception {
-		Integer sellerID = (Integer) execution.getVariable("sellerID");
-		Integer totalPrice = (Integer) execution.getVariable("totalPrice");
-		  
-		sendRefundPayment(sellerID, totalPrice);
+		Integer orderID = (Integer) execution.getVariable("orderID");
+		int statusID = 9;
+		
+		OrderStatusChanger.setOrderStatus(orderID, statusID);
 	}
 
 }

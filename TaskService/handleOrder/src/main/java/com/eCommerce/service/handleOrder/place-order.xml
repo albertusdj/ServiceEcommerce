@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:plink="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" xmlns:s0="place_order_service.app" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap11enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap12enc="http://www.w3.org/2003/05/soap-encoding" xmlns:soap12env="http://www.w3.org/2003/05/soap-envelope" xmlns:tns="soa.logistic.order" xmlns:wsa="http://schemas.xmlsoap.org/ws/2003/03/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="soa.logistic.order" name="Application"><wsdl:types><xs:schema targetNamespace="soa.logistic.order" elementFormDefault="qualified"><xs:import namespace="place_order_service.app"/><xs:complexType name="place_order"><xs:sequence><xs:element name="order_requests" type="s0:OrderRequestArray" minOccurs="0" nillable="true"/></xs:sequence></xs:complexType><xs:complexType name="place_orderResponse"><xs:sequence><xs:element name="place_orderResult" type="s0:OrderResponseArray" minOccurs="0" nillable="true"/></xs:sequence></xs:complexType><xs:element name="place_order" type="tns:place_order"/><xs:element name="place_orderResponse" type="tns:place_orderResponse"/></xs:schema><xs:schema targetNamespace="place_order_service.app" elementFormDefault="qualified"><xs:complexType name="OrderRequest"><xs:sequence><xs:element name="sender_secret_key" type="xs:string" minOccurs="0" nillable="true"/><xs:element name="from_lat" type="xs:double" minOccurs="0" nillable="true"/><xs:element name="from_lng" type="xs:double" minOccurs="0" nillable="true"/><xs:element name="destination" type="xs:string" minOccurs="0" nillable="true"/><xs:element name="weight" type="xs:double" minOccurs="0" nillable="true"/><xs:element name="receiver_name" type="xs:string" minOccurs="0" nillable="true"/><xs:element name="additional_detail" type="xs:string" minOccurs="0" nillable="true"/></xs:sequence></xs:complexType><xs:complexType name="OrderResponse"><xs:sequence><xs:element name="status" type="xs:string" minOccurs="0" nillable="true"/><xs:element name="order_unique_id" type="xs:string" minOccurs="0" nillable="true"/></xs:sequence></xs:complexType><xs:complexType name="OrderResponseArray"><xs:sequence><xs:element name="OrderResponse" type="s0:OrderResponse" minOccurs="0" maxOccurs="unbounded" nillable="true"/></xs:sequence></xs:complexType><xs:complexType name="OrderRequestArray"><xs:sequence><xs:element name="OrderRequest" type="s0:OrderRequest" minOccurs="0" maxOccurs="unbounded" nillable="true"/></xs:sequence></xs:complexType><xs:element name="OrderRequest" type="s0:OrderRequest"/><xs:element name="OrderResponse" type="s0:OrderResponse"/><xs:element name="OrderResponseArray" type="s0:OrderResponseArray"/><xs:element name="OrderRequestArray" type="s0:OrderRequestArray"/></xs:schema></wsdl:types><wsdl:message name="place_order"><wsdl:part name="place_order" element="tns:place_order"/></wsdl:message><wsdl:message name="place_orderResponse"><wsdl:part name="place_orderResponse" element="tns:place_orderResponse"/></wsdl:message><wsdl:service name="OrderService"><wsdl:port name="Application" binding="tns:Application"><soap:address location="http://127.0.0.1:9999/"/></wsdl:port></wsdl:service><wsdl:portType name="Application"><wsdl:operation name="place_order" parameterOrder="place_order"><wsdl:documentation>order_requests = list(order_requests)
+        grouped_requests = {}
+        for order_request in order_requests:
+            if grouped_requests.get(order_request.sender_secret_key) is None:
+                grouped_requests[order_request.sender_secret_key] = []
+
+            grouped_requests[order_request.sender_secret_key].append(order_request)
+
+        responses = []
+
+        for key, order_requests in grouped_requests.items():
+            headers = {'Authorization': order_requests[0].sender_secret_key}
+            data = {
+                'emp_id': 1,
+                "from_lat": order_requests[0].from_lat,
+                'from_lng': order_requests[0].from_lng,
+                'additional_detail': '',
+                'items': []
+            }
+            for order_request in order_requests:
+                item = {
+                    "receiver_name": order_request.receiver_name,
+                    'weight': order_request.weight,
+                    'to_lat': float(order_request.destination.split(',')[0]),
+                    'to_lng': float(order_request.destination.split(',')[1])
+                }
+
+                data['additional_detail'] += order_request.additional_detail
+
+                data['items'].append(item)
+
+            response = requests.post(BASE_URL + 'order', json=data, headers={'Authorization' : order_requests[0].sender_secret_key}).json()
+            for _ in range(len(order_requests)):
+                if response.get('error'):
+                    responses.append(OrderResponse(
+                        status="Fail: "+response.get('error'),
+                        order_unique_id="fail" #response['unique_id']
+                    ))
+                else:
+                    responses.append(OrderResponse(
+                        status="Success",
+                        order_unique_id=response['unique_id']
+                    ))
+
+        return responses</wsdl:documentation><wsdl:input name="place_order" message="tns:place_order"/><wsdl:output name="place_orderResponse" message="tns:place_orderResponse"/></wsdl:operation></wsdl:portType><wsdl:binding name="Application" type="tns:Application"><soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/><wsdl:operation name="place_order"><soap:operation soapAction="place_order" style="document"/><wsdl:input name="place_order"><soap:body use="literal"/></wsdl:input><wsdl:output name="place_orderResponse"><soap:body use="literal"/></wsdl:output></wsdl:operation></wsdl:binding></wsdl:definitions>
