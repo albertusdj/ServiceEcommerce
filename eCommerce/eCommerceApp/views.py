@@ -305,8 +305,8 @@ class UserCart(CSRFExemptMixin, View):
 		try:
 			cart[0].quantity+=body['quantity']
 		except:
-			cart[0].quantity=1
-		cart[0].subtotal = product.price * cart[0].quantity
+			cart[0].quantity+=1
+		cart[0].subtotal += product.price * cart[0].quantity
 		cart[0].save()
 
 		response = serializers.serialize('json', [cart[0]])
