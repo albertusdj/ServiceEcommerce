@@ -16,12 +16,16 @@ headers = {
 }
 
 class Checkout(ServiceBase):
-    @rpc(Unicode(nillable=False), _returns=Integer)
-    def username(ctx, name):
+    @rpc(Unicode(nillable=False),Unicode(nillable=False), _returns=Integer)
+    def sendCheckoutRequest(ctx, name, paymentmethod):
         data_checkout = {
             "username" : {
                 "value" : name,
                 "type" : "String"
+            },
+            "paymentMethod" : {
+                "value" : paymentmethod,
+                "type"  : "String"
             }
         }
         data = {
@@ -31,15 +35,14 @@ class Checkout(ServiceBase):
         }
         print (data)
         r = requests.post(link, json=data, headers=headers)
-        return r
-        # return 'Hello, {}'.format(name)
+        return r.status_code
 class HandleOrder(ServiceBase):
     @rpc(Integer(nillable=False), _returns=Integer)
     def orderHandlerID(ctx, order_id):
         data_order = {
             "orderID" : {
-                "value" : name,
-                "type" : "Integer"
+                "value" : order_id,
+                "type" : "String"
             }
         }
         data = {
@@ -47,15 +50,14 @@ class HandleOrder(ServiceBase):
             "businessKey" : 2,
             "processVariables" : data_order
         }
-        r = requests.post(link, json=data, headers=Integer)
+        r = requests.post(link, json=data, headers=headers)
         return r.status_code
-        # return 'Hello, {}'.format(name)
 class Refund(ServiceBase):
     @rpc(Integer(nillable=False), _returns=Integer)
     def orderToRefund(ctx, order_id):
         data_order = {
             "orderID" : {
-                "value" : name,
+                "value" : order_id,
                 "type" : "Integer",
             }
         }
@@ -64,7 +66,7 @@ class Refund(ServiceBase):
             "businessKey" : 3,
             "processVariable" : data_order
         }
-        r = requests.post(link, json=data, headers=header)
+        r = requests.post(link, json=data, headers=headers)
         return r.status_code
 
 soap_app = Application(
