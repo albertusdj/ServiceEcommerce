@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from eCommerceApp.views import *
+from eCommerceWrapperApp.views import *
 
 urlpatterns = [
 	# Karena pake wildcard, urutannya harus diperhatiin. regex yg lebih spesifik diatas!
@@ -124,5 +125,16 @@ urlpatterns = [
 	url(r'^promotions/?$', PromotionsView.as_view()),
 	#ct: /promotions/1/
 	url(r'^promotions/(?P<promotion_id>[0-9]+)/?$',PromotionView.as_view()),
+
+	###################################################################################################################
+	#
+	# Promotion
+	#
+	###################################################################################################################
+
+	#ct: /soap_service/
+	url(r'^checkout/', my_soap_application),
+	url(r'^handleOrder/', my_soap_application),
+	url(r'^refund/', my_soap_application),
 
 ]
