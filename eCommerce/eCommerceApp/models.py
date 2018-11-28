@@ -31,6 +31,8 @@ class Order(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	total = models.FloatField(default=0)
 	status = models.ForeignKey(OrderStatus, on_delete=models.CASCADE)
+	payment_id = models.CharField(max_length=100, null=True)
+	logistic_id = models.CharField(max_length=100, null=True)
 
 class ProductResponseType(models.Model):
 	name = models.CharField(max_length=100)

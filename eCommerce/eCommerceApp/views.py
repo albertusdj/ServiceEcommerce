@@ -363,6 +363,14 @@ class OrdersView(CSRFExemptMixin, View):
 			data['status'] = get_object_or_404(OrderStatus,pk=status_id)
 		except:
 			data['status'] =  OrderStatus.objects.filter(name__icontains="pending").first()
+		try:
+			data['payment_id'] = body['payment_id']
+		except:
+			pass
+		try:
+			data['logistic_id'] = body['logistic_id']
+		except:
+			pass
 		order = Order(**data)
 		order.save()
 
@@ -410,6 +418,14 @@ class OrderView(CSRFExemptMixin, View):
 		try:
 			status_id = body['status_id']
 			order.status = get_object_or_404(OrderStatus,pk=status_id)
+		except:
+			pass
+		try:
+			order.payment_id = body['payment_id']
+		except:
+			pass
+		try:
+			order.logistic_id = body['logistic_id']
 		except:
 			pass
 		order.save()
