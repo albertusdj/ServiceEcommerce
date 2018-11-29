@@ -6,7 +6,7 @@
       <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
       <bpmn:messageEventDefinition messageRef="Message_1e7fa9c" />
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_0g8esi6" sourceRef="Task_0fq2g09" targetRef="IntermediateThrowEvent_11yl081" />
+    <bpmn:sequenceFlow id="SequenceFlow_0g8esi6" sourceRef="Task_0fq2g09" targetRef="Task_03bb95t" />
     <bpmn:sendTask id="Task_0fq2g09" name="Notify Seller" camunda:class="com.eCommerce.service.handleOrder.LoggerDelegate">
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0g8esi6</bpmn:outgoing>
@@ -22,7 +22,7 @@
     <bpmn:sequenceFlow id="SequenceFlow_0kjibqo" sourceRef="Task_06fgsie" targetRef="ExclusiveGateway_19b82qj" />
     <bpmn:sequenceFlow id="SequenceFlow_0r3sy6x" sourceRef="IntermediateThrowEvent_11yl081" targetRef="Task_06fgsie" />
     <bpmn:intermediateCatchEvent id="IntermediateThrowEvent_11yl081" name="Wait for timeout">
-      <bpmn:incoming>SequenceFlow_0g8esi6</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_143sui7</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0r3sy6x</bpmn:outgoing>
       <bpmn:timerEventDefinition>
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30S</bpmn:timeDuration>
@@ -46,6 +46,11 @@
     <bpmn:endEvent id="EndEvent_0di5pk9" name="Process error">
       <bpmn:incoming>SequenceFlow_110ngm8</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_143sui7" sourceRef="Task_03bb95t" targetRef="IntermediateThrowEvent_11yl081" />
+    <bpmn:sendTask id="Task_03bb95t" name="Ship Product Request" camunda:class="com.eCommerce.service.handleOrder.ShipProductRequester">
+      <bpmn:incoming>SequenceFlow_0g8esi6</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_143sui7</bpmn:outgoing>
+    </bpmn:sendTask>
   </bpmn:process>
   <bpmn:message id="Message_1e7fa9c" name="OrderReceived" />
   <bpmn:message id="Message_0f6140i" name="ProductSent" />
@@ -54,24 +59,24 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="handleOrder">
       <bpmndi:BPMNEdge id="SequenceFlow_08va5r8_di" bpmnElement="SequenceFlow1">
-        <di:waypoint x="209" y="120" />
-        <di:waypoint x="270" y="120" />
+        <di:waypoint x="47" y="120" />
+        <di:waypoint x="97" y="120" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="337.5" y="110" width="90" height="20" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="StartEvent_1cgnklg_di" bpmnElement="StartEventProcessStarted">
-        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <dc:Bounds x="11" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="171" y="138" width="41" height="27" />
+          <dc:Bounds x="9" y="138" width="41" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0g8esi6_di" bpmnElement="SequenceFlow_0g8esi6">
-        <di:waypoint x="370" y="120" />
-        <di:waypoint x="443" y="120" />
+        <di:waypoint x="197" y="120" />
+        <di:waypoint x="265" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="SendTask_1ohfeg9_di" bpmnElement="Task_0fq2g09">
-        <dc:Bounds x="270" y="80" width="100" height="80" />
+        <dc:Bounds x="97" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0wytfeq_di" bpmnElement="Task_02wgcdb">
         <dc:Bounds x="834" y="177" width="100" height="80" />
@@ -126,6 +131,13 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="923" y="145" width="68" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_143sui7_di" bpmnElement="SequenceFlow_143sui7">
+        <di:waypoint x="365" y="120" />
+        <di:waypoint x="443" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SendTask_1bjp1ae_di" bpmnElement="Task_03bb95t">
+        <dc:Bounds x="265" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
